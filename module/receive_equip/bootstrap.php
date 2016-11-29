@@ -122,18 +122,5 @@ return function (Slim\App $app) {
             return $response;
         })->setName('receive_equip.receive_doc');
 
-
-/******************* only for tests ***************************/
-        $app->get('/receive-equip/undo-submit/{applicationform_id}', function (Request $req, Response $res) use ($container) {
-            $route = $req->getAttribute('route');
-            $applicationform_id = $route->getArgument('applicationform_id');
-
-            $sql = 'update `applicationform` set `approved`=1, `received_ts`=null where `id`=' . $applicationform_id;
-            R::exec($sql);
-
-            return $res->withRedirect("/receive-equip");
-
-        })->setName('receive_equip.undosubmit');
-/******************  /only for tests ***************************/
     });
 };
