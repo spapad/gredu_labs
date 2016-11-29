@@ -42,6 +42,12 @@ return [
                 ['/in_numbers', ['guest', 'user'], ['get']],
                 ['/export/csv/edulabs_{type}.csv', ['guest', 'user'], ['get']],
                 ['/open-data', ['guest', 'user'], ['get']],
+                ['/university-form', ['guest'], ['get', 'post']],
+                ['/university-form/submit-success',['guest'],['get']],
+                ['/teacher-form', ['guest'], ['get', 'post']],
+                ['/teacher-form/submit-success',['guest'], ['get','post']],
+                ['/teacher-form/mm',['guest'], ['get']],
+
             ],
         ],
     ],
