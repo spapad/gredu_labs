@@ -19,7 +19,7 @@ class UniversityFormService implements UniversityFormServiceInterface
     {
 
       	$appForm                      = R::dispense('univ');
-        $appForm->id                  = $data['id'];
+//        $appForm->id                  = $data['id'];
         $appForm->idrima              = $data['idrima'];
         $appForm->sxolh               = $data['sxolh'];
         $appForm->tmhma               = $data['tmhma'];
@@ -29,9 +29,9 @@ class UniversityFormService implements UniversityFormServiceInterface
         $appForm->email               = $data['email'];
         $appForm->projectdescription   = $data['projectdescription'];
         $appForm->comments            = $data['comments'];
- 
- 
-        R::store($appForm); 
+
+
+        R::store($appForm);
         return $appForm;
 
     }

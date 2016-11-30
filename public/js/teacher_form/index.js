@@ -35,16 +35,16 @@ $(document).ready(function() {
     var max_fields      = 10; //maximum input boxes allowed
     var wrapper         = $(".input_fields_wrap"); //Fields wrapper
     var add_button      = $(".add_field_button"); //Add button ID
-   
+
     var x = 1; //initlal text box count
     $(add_button).click(function(e){ //on add input button click
         e.preventDefault();
         if(x < max_fields){ //max input box allowed
             x++; //text box increment
-            $(wrapper).append('<div><div><label for="projects">Σχετική δράση που συμμετείχατε </label><input type="text" name="projects[]" id="projects"></div>        <div><label for="urlproject">URL δράσης που συμμετείχατε</label><input type="text" name="urlproject[]" id="urlproject"></div>        <div><label for "commentproject">Περιγραφή δράσης που συμμετείχατε</label><input type="text" name="commentsproject[]" id="commentproject"></div><a href="#" class="remove_field">Διαγραφή</a></div>'); 
+            $(wrapper).append('<div><div><label for="projects">Σχετική δράση που συμμετείχατε </label><input type="text" name="projects" id="projects"></div>        <div><label for="urlproject">URL δράσης που συμμετείχατε</label><input type="text" name="urlproject" id="urlproject"></div>        <div><label for "commentproject">Περιγραφή δράσης που συμμετείχατε</label><input type="text" name="commentsproject" id="commentproject"></div><a href="#" class="remove_field">Διαγραφή</a></div>'); 
         }
     });
-   
+
     $(wrapper).on("click",".remove_field", function(e){ //user click on remove text
         e.preventDefault();
          $(this).parent('div').remove(); x--;
@@ -55,7 +55,7 @@ $(document).ready(function() {
 
        var projects = $("input[id='projects']")
               .map(function(){return $(this).val();}).get();
-     
+
       var urlproject = $("input[id='urlproject']")
               .map(function(){return $(this).val();}).get();
 
