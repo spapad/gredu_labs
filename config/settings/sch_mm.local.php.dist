@@ -12,6 +12,6 @@ return [
         'api_url' => '',
         'api_user' => '',
         'api_pass' => '',
-        'public_api_url' => '', // currently working: 'https://mm.sch.gr/api/units
+        'public_api_url' => '', // currently working: 'https://mm.sch.gr/api/units'
     ]
 ];
