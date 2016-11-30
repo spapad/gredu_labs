@@ -4,7 +4,7 @@
 {% import "schools/form.twig" as macros %}
 
 {% block content %}
-<style> 
+<style>
 input[type=text] {
     width: 100%;
 }
@@ -47,27 +47,27 @@ input[type=text] {
 
                          <br>
                          <br>
-                         <br> 
+                         <br>
     <h3> Δράσεις</h3>
-    Παρακαλώ περιγράψτε σύντομα δράσεις που έχετε συμμετάσχει. 
+    Παρακαλώ περιγράψτε σύντομα δράσεις που έχετε συμμετάσχει.
     <div class="input_fields_wrap">
         <button style="color:blue" class="add_field_button" "btn btn-lg btn-primary">Προσθήκη Επιπλέον</button>
-        <div><label for="projects">Σχετική δράση που συμμετείχατε </label><input type="text" name="projects[]" id="projects"></div>
-        <div><label for="urlproject">URL δράσης που συμμετείχατε</label><input type="text" name="urlproject[]" id="urlproject"></div>
-        <div><label for "commentproject">Περιγραφή δράσης που συμμετείχατε</label><input type="text" name="commentsproject[]" id="commentproject"></div>
-        
-        
+        <div><label for="projects">Σχετική δράση που συμμετείχατε </label><input type="text" name="projects" id="projects"></div>
+        <div><label for="urlproject">URL δράσης που συμμετείχατε</label><input type="text" name="urlproject" id="urlproject"></div>
+        <div><label for "commentproject">Περιγραφή δράσης που συμμετείχατε</label><input type="text" name="commentsproject" id="commentproject"></div>
+
+
     </div>
 
-   <input type="hidden" name="projectdescription" id="projectdescription"> 
+   <input type="hidden" name="projectdescription" id="projectdescription">
 
    <p>
     <p>
 
 <!--                </div>  -->
                 {{ macros.text('comments', 'Σχόλια/Παρατηρήσεις', form.values.comments) }}
-    
-    
+
+
 
 
             </fieldset>
