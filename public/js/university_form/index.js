@@ -196,6 +196,8 @@ $('#newselect').on('change', function() {
   switch(selection)
    {
        case 'idrimata':
+  		document.getElementById('second').style.display = "none";
+		document.getElementById('first').style.display = "block";
            $('#el-ereunitiko').attr("disabled", true);
            $('#el-ereunitiko').val('');
            $('#el-institute').attr("disabled", true);
@@ -211,6 +213,15 @@ $('#newselect').on('change', function() {
            $('label[for="el-sxolh"]').attr("disabled", false);
            $('label[for="el-tmhma"]').attr("disabled", false);
            $('label[for="el-idrima"]').attr("disabled", false);
+
+		  if (document.getElementById("el-idrima").options.length != 0) 
+		  {
+		    var i;
+		    for(i = document.getElementById("el-idrima").options.length-1;i >= 1; i--)
+		    {
+		       document.getElementById("el-idrima").remove(i);
+		    }
+		  }
 
     $.post({
         url: 'http://relabs1.minedu.gov.gr/mypoint/taxonomy_vocabulary/getTree.json',
@@ -235,6 +246,8 @@ $('#newselect').on('change', function() {
      }
      else
      {
+
+
             $('#el-idrima')
            .append($("<option></option>")
                     .attr("value",index)
@@ -246,6 +259,8 @@ $('#newselect').on('change', function() {
 
        break;
        case 'ereunitika':
+  		document.getElementById('first').style.display = "none"; 
+		document.getElementById('second').style.display = "block";
            $('#el-idrima').val('');
            $('#el-sxolh').val('');
            $('#el-tmhma').val('');
@@ -261,6 +276,18 @@ $('#newselect').on('change', function() {
            $('label[for="el-idrima"]').attr("disabled", true);
            $('label[for="el-sxolh"]').attr("disabled", true);
            $('label[for="el-tmhma"]').attr("disabled", true);
+
+		if (document.getElementById("el-ereunitiko").options.length != 0) 
+		  {
+		    var i;
+		    for(i = document.getElementById("el-ereunitiko").options.length-1;i >= 1; i--)
+		    {
+		       document.getElementById("el-ereunitiko").remove(i);
+		    }
+		  }
+
+
+
      $.post({
             url: 'http://relabs1.minedu.gov.gr/mypoint/taxonomy_vocabulary/getTree.json',
             type: 'POST',
@@ -485,3 +512,4 @@ function refresh1(key) {
 
     });
 }
+
