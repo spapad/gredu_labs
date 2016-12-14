@@ -19,22 +19,22 @@ class UniversityFormService implements UniversityFormServiceInterface
     {
 
       	$appForm                      = R::dispense('univ');
-//        $appForm->id                  = $data['id'];
+        $appForm->id                  = $data['id'];
         $appForm->idrima              = $data['idrima'];
         $appForm->sxolh               = $data['sxolh'];
         $appForm->tmhma               = $data['tmhma'];
         $appForm->ereunitiko          = $data['ereunitiko'];
-        $appForm->institute           = $data['istitute'];
+        $appForm->institute           = $data['institute'];
         $appForm->other               = $data['other'];
         $appForm->erga                = $data['erga'];
         $appForm->person              = $data['person'];
         $appForm->telef               = trim($data['telef']);
         $appForm->email               = $data['email'];
-        $appForm->projectdescription   = $data['projectdescription'];
+        $appForm->projectdescription  = $data['projectdescription'];
         $appForm->comments            = $data['comments'];
-
-
-        R::store($appForm);
+ 
+ 
+        R::store($appForm); 
         return $appForm;
 
     }
