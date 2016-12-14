@@ -29,8 +29,8 @@ window.onload = function() {
            $('label[for="el-sxolh"]').attr("disabled", true);
            $('label[for="el-tmhma"]').attr("disabled", true);
 
-           if(isNaN(parseInt(document.getElementById("hididrima").value))){
-
+           if(document.getElementById("hididrima").value == ''){
+           		
            }
            else
            { 
@@ -38,7 +38,7 @@ window.onload = function() {
              $("#newselect").change();
            }
 
-            if(isNaN(parseInt(document.getElementById("hidereunitiko").value))){
+            if(document.getElementById("hidereunitiko").value==''){
 
             }
           else
@@ -175,16 +175,43 @@ $(document).ready(function() {
      var commentproject = $("input[id='commentproject']")
               .map(function(){return $(this).val();}).get();
 
-      var newfield = projects+"#"+urlproject+"#"+commentproject;
+      var newfield = projects+"#@!"+urlproject+"#@!"+commentproject;
 
       $('#projectdescription').val(newfield);
+
+      idrimadb = $("#el-idrima option:selected").text();
+	  $('#el-idrima')
+           .append($("<option selected ></option>")
+                    .attr("value",idrimadb)
+                    .text(idrimadb));
+
+      sxolhdb = $("#el-sxolh option:selected").text();
+	  $('#el-sxolh')
+           .append($("<option selected ></option>")
+                    .attr("value",sxolhdb)
+                    .text(sxolhdb));
+
+     tmhmadb = $("#el-tmhma option:selected").text();
+     $('#el-tmhma')
+           .append($("<option selected ></option>")
+                    .attr("value",tmhmadb)
+                    .text(tmhmadb));
+
+	ereunitikodb = $("#el-ereunitiko option:selected").text();
+	$('#el-ereunitiko')
+           .append($("<option selected ></option>")
+                    .attr("value",ereunitikodb)
+                    .text(ereunitikodb));
+
+	institutedb = $("#el-institute option:selected").text();
+	$('#el-institute')
+           .append($("<option selected ></option>")
+                    .attr("value",institutedb)
+                    .text(institutedb));
 
     })
 
 });
-
-
-
 
 
 
@@ -236,7 +263,7 @@ $('#newselect').on('change', function() {
     for ( var index = 0; index < data.length; index++ ) {
       if (data[ index ].depth == 0)
       {
-        if (index == parseInt(document.getElementById("hididrima").value)){
+        if (data[ index ].name == document.getElementById("hididrima").value){
            $('#el-idrima')
            .append($("<option selected ></option>")
                     .attr("value",index)
@@ -300,7 +327,7 @@ $('#newselect').on('change', function() {
             if (data1[ index1 ].depth == 0)
             {
         
-            if (index1 == parseInt(document.getElementById("hidereunitiko").value))
+            if (data1[ index1 ].name == document.getElementById("hidereunitiko").value)
             {
                  $('#el-ereunitiko')
                     .append($("<option selected ></option>")
@@ -408,7 +435,7 @@ $('#newselect').on('change', function() {
    for ( var index = 0; index < data.length; index++ ) 
    {
       if (data[ index ].parents == data[key].tid && data[ index ].depth == 1)
-         if (index == parseInt(document.getElementById("hidsxolh").value))
+         if (data[ index ].name == document.getElementById("hidsxolh").value)
          {
             $('#el-sxolh')
                  .append($("<option selected></option>")
@@ -418,7 +445,7 @@ $('#newselect').on('change', function() {
             for ( var index1 = 0; index1 < data.length; index1++ ) 
             {
               if (data[ index1 ].parents == data[index].tid && data[ index1 ].depth == 2)
-              if (index1 == parseInt(document.getElementById("hidtmhma").value))
+              if (data[ index1 ].name == document.getElementById("hidtmhma").value)
               {
 
                  $('#el-tmhma')
@@ -471,7 +498,7 @@ function refresh1(key) {
 
      for ( var index1 = 0; index1 < data1.length; index1++ ) {
      if (data1[index1].parents == data1[key].tid && data1[ index1 ].depth == 1)
-      if (index1 == parseInt(document.getElementById("hidinstitute").value)){
+      if (data1[ index1 ].name == document.getElementById("hidinstitute").value){
 
 
          $('#el-institute')
@@ -495,7 +522,7 @@ function refresh1(key) {
 
 
 	
-	if (parseInt(document.getElementById("hidinstitute").value)== 1000)
+	if (document.getElementById("hidinstitute").value == 'ΑΛΛΟ')
 			{
 
 	  		$('#el-institute')
