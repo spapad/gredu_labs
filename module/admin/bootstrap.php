@@ -22,16 +22,6 @@ return function (App $app) {
     });
 
     $events('on', 'app.services', function (Container $container) {
-//        $nav = $container['settings']->get('navigation');
-//        $nav['admin'] = [
-//            'adminhome' => [
-//                'label' => 'Διαχειριστής',
-//                'route' => 'admin',
-//                'icon' => 'user-secret',
-//            ],
-//        ];
-//        $container['settings']->set('navigation', $nav);
-
         $container[GrEduLabs\Admin\Action\Index::class] = function ($c) {
             return new GrEduLabs\Admin\Action\Index($c['view']);
         };
@@ -41,6 +31,6 @@ return function (App $app) {
         $view = $c->get('view');
         $view->getEnvironment()->getLoader()->prependPath(__DIR__ . '/templates');
         $app->get('/admin', GrEduLabs\Admin\Action\Index::class)
-                ->setName('admin');
+            ->setName('admin');
     });
 };

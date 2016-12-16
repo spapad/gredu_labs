@@ -6,9 +6,24 @@
             <div class="panel-heading">
                 <h4>Σελίδα διαχειριστή</h4>
             </div>
-            <div class="panel-body">
-                <p>Διαθέσιμες διαχειριστικές λειτουργίες</p>
-            </div>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Διαθέσιμες διαχειριστικές λειτουργίες</th>
+                        <th>&nbsp;</th>
+                    <tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Καταχωρημένες αιτήσεις εθελοντών - Εκπαιδευτικοί</td>
+                        <td><a class="btn btn-primary btn-sm" href="{{ path_for('export.csv', {type: 'volunteer_teachers'}) }}"><i class="fa fa-download"></i> Αρχείο .csv</a></td>
+                    </tr>
+                    <tr>
+                        <td>Καταχωρημένες αιτήσεις εθελοντών - Ιδρύματα</td>
+                        <td><a class="btn btn-primary btn-sm" href="{{ path_for('export.csv', {type: 'volunteer_institutions'}) }}"><span class="fa fa-download"></span> Αρχείο .csv</a></td>
+                    </tr>
+                </tbody>
+            </table>
             <div class="panel-footer text-center">
                 <a class="btn btn-sm btn-default" href="{{ path_for('index') }}"><span class="fa fa-home"></span> Αρχική</a>
                 <a class="btn btn-sm btn-primary" href="{{ path_for('admin') }}"><span class="fa fa-user-secret"></span> Διαχειριστής</a>
