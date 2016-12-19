@@ -1,0 +1,48 @@
+{% extends "layout.twig" %}
+{% block content %}
+    <div id="approved_applications">
+        <h1>Ιδρύματα <small>Αιτήσεις εκπαιδευτικών</small></h1>
+        <p>Ακολουθεί λίστα των αιτήσεων που κατατέθηκαν από εκπαιδευτικούς.</p>
+        {% if forms %}
+            <div class="table-responsive">
+                <caption>Συνολικά <span class="label label-success">{{ forms | length }} αιτήσεις</span>
+                    <span class="pull-right">
+                        <a class="btn btn-primary btn-sm" href="{{ path_for('export.csv', {type: 'volunteer_teachers'}) }}"><span class="fa fa-download"></span> Αρχείο .csv</a>
+                    </span>
+                </caption>
+                <table class="table table-condensed table-hover">
+                    <thead>
+                        <tr>
+                            <th class="text-center">ID</th>
+                            <th>Ονοματεπώνυμο<br/>
+                                <span class="text-muted">Αριθμός μητρώου, Ειδικότητα</span></th>
+                            <th>Σχολείο <span class="text-muted">Τηλέφωνο</span></th>
+                            <th>Τηλέφωνο</th>
+                            <th>Email</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for form in forms %}
+                            <tr>
+                                <td class="text-center col-xs-1"><span class="text-muted">{{ form.id }}</span></td>
+                                <td class="col-xs-4">{{ form.name }} {{ form.surname }}<br/>
+                                    <span class="text-muted">{{ form.arithmitroou }}, {{ form.eidikothta_name }}</span></td>
+                                <td class="col-xs-4">{{ form.school }} <span class="text-muted">{{ form.schooltelef }}</span></td>
+                                <td class="col-xs-1">{{ form.telef }}</td>
+                                <td class="col-xs-2">{{ form.email }}</td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td colspan="4"><span class="text-muted">ΣΧΟΛΙΑ:</span> {{ form.comments }}<br/>
+                                    <span class="text-muted">ΕΡΓΑ:</span> {{ form.projectdescription|raw }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-info" role="alert">Δεν υπάρχουν καταχωρημένα στοιχεία</div>
+        {% endif %} 
+    </div>
+{% endblock %}
+

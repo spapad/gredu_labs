@@ -79,5 +79,11 @@ return [
             ],
 
         ],
+        'admin' => [
+            'adminhome' => [
+                'label' => 'Σελίδα διαχειριστή',
+                'route' => 'admin',
+            ],
+        ]
     ],
 ];

@@ -28,7 +28,8 @@ return [
         'module/open_data/bootstrap.php',
         'module/university_form/bootstrap.php',
         'module/teacher_form/bootstrap.php',
- 
+        'module/enable_db_login/bootstrap.php',
+        'module/admin/bootstrap.php',
     ],
     'cache_config' => 'data/cache/config/settings.php',
 ];

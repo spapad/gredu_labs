@@ -7,6 +7,7 @@ use Slim\App;
 use Slim\Container;
 use Slim\Http\Request;
 use Slim\Http\Response;
+use GrEduLabs\UniversityForm\Service\UniversityFormService;
 
 /**
  * gredu_labs.
@@ -21,6 +22,13 @@ return function (App $app) {
     $events = $container['events'];
 
     $events('on', 'app.services', function (Container $c) {
+
+        $c['csv_export_protected_exports'] = function ($c) {
+            return [
+                'volunteer_teachers',
+                'volunteer_institutions',
+            ];
+        };
 
         $c['csv_export_config'] = function ($c) {
 
@@ -70,7 +78,7 @@ return function (App $app) {
                         'Σχόλια - Παρατηρήσεις',
                     ],
                 ],
-                 'software' => [
+                'software' => [
                     'data_callback' => 'csv_export_software',
                     'headers' => [
                         'Τύπος',
@@ -95,8 +103,7 @@ return function (App $app) {
                         'Σχόλια - Παρατηρήσεις',
                     ],
                 ],
-             
- 				'appnewforms' => [
+                'appnewforms' => [
                     'data_callback' => 'csv_export_appnewforms',
                     'headers' => [
                         'ID',
@@ -107,8 +114,6 @@ return function (App $app) {
                         'Σχόλια - Παρατηρήσεις',
                     ],
                 ],
-             
-
                 'appforms_items' => [
                     'data_callback' => 'csv_export_appforms_items',
                     'headers' => [
@@ -140,6 +145,63 @@ return function (App $app) {
                         'Πλήθος Αιτουμένων',
                         'Πλήθος Υπαρχόντων που λειτουργούν',
                         'Αιτιολογία χρήσης',
+                    ],
+                ],
+                'volunteer_teachers' => [
+                    'data_callback' => 'csv_export_volunteer_teachers',
+                    'headers' => [
+                        'ID',
+                        'Όνομα',
+                        'Επώνυμο',
+                        'Ειδικότητα',
+                        'Ειδικότητα (λεκτικό)',
+                        'Αριθμός Μητρώου',
+                        'Τηλέφωνο',
+                        'Email',
+                        'Σχολείο που υπηρετεί',
+                        'Τηλέφωνο Σχολείου',
+                        'Σχόλια/Παρατηρήσεις',
+                        'Σχετική δράση που συμμετείχε',
+                        'URL δράσης που συμμετείχε',
+                        'Περιγραφή δράσης που συμμετείχε',
+                        'Έργο 1',
+                        'Έργο 2',
+                        'Έργο 3',
+                        'Έργο 4',
+                        'Έργο 5',
+                        'Έργο 6',
+                        'Έργο 7',
+                        'Έργο 8',
+                        'Έργο 9',
+                        'Έργο 10',
+                    ],
+                ],
+                'volunteer_institutions' => [
+                    'data_callback' => 'csv_export_volunteer_institutions',
+                    'headers' => [
+                        'ID',
+                        'Ίδρυμα',
+                        'Σχολή',
+                        'Τμήμα',
+                        'Ερευνητικό Κέντρο',
+                        'Ινστιτούτο',
+                        'Άλλο',
+                        'Υπεύθυνος Επικοινωνίας',
+                        'Τηλέφωνο',
+                        'Email',
+                        'Σχόλια/Παρατηρήσεις',
+                        'Έργα',
+                        'Περιγραφή (ακολουθούν ανά στήλη)',
+                        'Έργο 1',
+                        'Έργο 2',
+                        'Έργο 3',
+                        'Έργο 4',
+                        'Έργο 5',
+                        'Έργο 6',
+                        'Έργο 7',
+                        'Έργο 8',
+                        'Έργο 9',
+                        'Έργο 10',
                     ],
                 ],
             ];
@@ -179,24 +241,96 @@ return function (App $app) {
             };
         };
 
+        $c['csv_export_volunteer_teachers'] = function ($c) {
+
+            return function () {
+                $sql = 'SELECT `volunteerteachers`.`id`, '
+                    . '`volunteerteachers`.`name`, '
+                    . '`volunteerteachers`.`surname`, '
+                    . '`volunteerteachers`.`eidikothta`, '
+                    . '`branch`.`name` AS `eidikothta_name`, '
+                    . '`volunteerteachers`.`arithmitroou`, '
+                    . '`volunteerteachers`.`telef`, '
+                    . '`volunteerteachers`.`email`, '
+                    . '`volunteerteachers`.`school`, '
+                    . '`volunteerteachers`.`schooltelef`, '
+                    . '`volunteerteachers`.`comments`, '
+                    . '`volunteerteachers`.`projecttitle`, '
+                    . '`volunteerteachers`.`projecturl`, '
+                    . '`volunteerteachers`.`projectdescription` '
+                    . ' FROM `volunteerteachers` JOIN `branch` ON (`volunteerteachers`.`eidikothta` = `branch`.`id`) '
+//                    . ' FROM `volunteerteachers` '
+                    . ' ORDER BY id ';
+
+                $volunteer_teachers = R::getAll($sql);
+
+                $volunteer_teachers = array_map(function ($row) {
+                    $row['projectdescription'] = UniversityFormService::recomposeProjects($row['projectdescription'], false);
+                    if (($projects = preg_split('/' . UniversityFormService::PLAIN_TEXT_SEPARATOR . '/msUu', $row['projectdescription'])) !== false) {
+                        foreach ($projects as $i => $proj) {
+                            $row["project{$i}"] = $proj;
+                        }
+                    }
+                    return $row;
+                }, $volunteer_teachers);
+
+                return $volunteer_teachers;
+            };
+        };
+
+        $c['csv_export_volunteer_institutions'] = function ($c) {
+
+            return function () {
+                $sql = 'SELECT `id`, '
+                    . '`idrima`, '
+                    . '`sxolh`, '
+                    . '`tmhma`, '
+                    . '`ereunitiko`, '
+                    . '`institute`, '
+                    . '`other`,'
+                    . '`person`, '
+                    . '`telef`, '
+                    . '`email`, '
+                    . '`comments`, '
+                    . '`erga`, '
+                    . '`projectdescription` '
+                    . ' FROM `univ` '
+                    . ' ORDER BY id';
+
+                $volunteer_institutions = R::getAll($sql);
+
+                $volunteer_institutions = array_map(function ($row) {
+                    $row['projectdescription'] = UniversityFormService::recomposeProjects($row['projectdescription'], false);
+                    if (($projects = preg_split('/' . UniversityFormService::PLAIN_TEXT_SEPARATOR . '/msUu', $row['projectdescription'])) !== false) {
+                        foreach ($projects as $i => $proj) {
+                            $row["project{$i}"] = $proj;
+                        }
+                    }
+                    return $row;
+                }, $volunteer_institutions);
+
+                return $volunteer_institutions;
+            };
+        };
+
         $c['csv_export_schools'] = function ($c) {
 
             return function () {
                 $sql = 'SELECT school.registry_no AS registry_no, '
-                        . ' school.name AS school_name, '
-                        . ' schooltype.name as school_type, '
-                        . ' prefecture.name AS prefecture, '
-                        . ' eduadmin.name AS eduadmin, '
-                        . ' regioneduadmin.name AS region_edu_admin, '
-                        . ' educationlevel.name AS education_level '
-                        . ' FROM school '
-                        . ' LEFT JOIN eduadmin ON school.eduadmin_id = eduadmin.id '
-                        . ' LEFT JOIN regioneduadmin ON eduadmin.regioneduadmin_id = regioneduadmin.id '
-                        . ' LEFT JOIN educationlevel ON school.educationlevel_id = educationlevel.id '
-                        . ' LEFT JOIN schooltype ON school.schooltype_id = schooltype.id '
-                        . ' LEFT JOIN prefecture ON school.prefecture_id = prefecture.id '
-                        . ' GROUP BY school.id '
-                        . ' ORDER BY school_name';
+                    . ' school.name AS school_name, '
+                    . ' schooltype.name as school_type, '
+                    . ' prefecture.name AS prefecture, '
+                    . ' eduadmin.name AS eduadmin, '
+                    . ' regioneduadmin.name AS region_edu_admin, '
+                    . ' educationlevel.name AS education_level '
+                    . ' FROM school '
+                    . ' LEFT JOIN eduadmin ON school.eduadmin_id = eduadmin.id '
+                    . ' LEFT JOIN regioneduadmin ON eduadmin.regioneduadmin_id = regioneduadmin.id '
+                    . ' LEFT JOIN educationlevel ON school.educationlevel_id = educationlevel.id '
+                    . ' LEFT JOIN schooltype ON school.schooltype_id = schooltype.id '
+                    . ' LEFT JOIN prefecture ON school.prefecture_id = prefecture.id '
+                    . ' GROUP BY school.id '
+                    . ' ORDER BY school_name';
                 $schools = R::getAll($sql);
 
                 return $schools;
@@ -207,30 +341,30 @@ return function (App $app) {
 
             return function () {
                 $sql = 'SELECT lab.id AS id, '
-                        . ' school.registry_no AS school_registry_no, '
-                        . ' school.name AS school_name, '
-                        . ' regioneduadmin.name AS region_edu_admin, '
-                        . ' TRIM(lab.name) AS name, '
-                        . ' TRIM(labtype.name) AS type, '
-                        . ' branch.name AS responsible_branch, '
-                        . ' IF(lab.is_new = 1, "ΝΑΙ", "ΟΧΙ") AS is_new, '
-                        . ' lab.area AS area, '
-                        . ' lab.has_network AS has_network, '
-                        . ' lab.has_server AS has_server, '
-                        . ' GROUP_CONCAT(lesson.name SEPARATOR ", ") AS lessons, '
-                        . ' TRIM(lab.use_in_program) AS use_in_program, '
-                        . ' TRIM(lab.use_ext_program) AS use_ext_program '
-                        . ' FROM lab '
-                        . ' LEFT JOIN labtype ON lab.labtype_id = labtype.id '
-                        . ' LEFT JOIN school ON lab.school_id = school.id '
-                        . ' LEFT JOIN eduadmin ON school.eduadmin_id = eduadmin.id '
-                        . ' LEFT JOIN regioneduadmin ON eduadmin.regioneduadmin_id = regioneduadmin.id '
-                        . ' LEFT JOIN lab_lesson ON lab_lesson.lab_id = lab.id '
-                        . ' LEFT JOIN lesson ON lab_lesson.lesson_id = lesson.id '
-                        . ' LEFT JOIN teacher ON lab.responsible_id = teacher.id '
-                        . ' LEFT JOIN branch ON branch.id = teacher.branch_id '
-                        . ' GROUP BY lab.id '
-                        . ' ORDER BY school_name ';
+                    . ' school.registry_no AS school_registry_no, '
+                    . ' school.name AS school_name, '
+                    . ' regioneduadmin.name AS region_edu_admin, '
+                    . ' TRIM(lab.name) AS name, '
+                    . ' TRIM(labtype.name) AS type, '
+                    . ' branch.name AS responsible_branch, '
+                    . ' IF(lab.is_new = 1, "ΝΑΙ", "ΟΧΙ") AS is_new, '
+                    . ' lab.area AS area, '
+                    . ' lab.has_network AS has_network, '
+                    . ' lab.has_server AS has_server, '
+                    . ' GROUP_CONCAT(lesson.name SEPARATOR ", ") AS lessons, '
+                    . ' TRIM(lab.use_in_program) AS use_in_program, '
+                    . ' TRIM(lab.use_ext_program) AS use_ext_program '
+                    . ' FROM lab '
+                    . ' LEFT JOIN labtype ON lab.labtype_id = labtype.id '
+                    . ' LEFT JOIN school ON lab.school_id = school.id '
+                    . ' LEFT JOIN eduadmin ON school.eduadmin_id = eduadmin.id '
+                    . ' LEFT JOIN regioneduadmin ON eduadmin.regioneduadmin_id = regioneduadmin.id '
+                    . ' LEFT JOIN lab_lesson ON lab_lesson.lab_id = lab.id '
+                    . ' LEFT JOIN lesson ON lab_lesson.lesson_id = lesson.id '
+                    . ' LEFT JOIN teacher ON lab.responsible_id = teacher.id '
+                    . ' LEFT JOIN branch ON branch.id = teacher.branch_id '
+                    . ' GROUP BY lab.id '
+                    . ' ORDER BY school_name ';
 
                 $labs = R::getAll($sql);
 
@@ -242,23 +376,23 @@ return function (App $app) {
 
             return function () {
                 $sql = 'SELECT TRIM(itemcategory.name) AS category, '
-                        . ' schoolasset.qty AS qty, '
-                        . ' schoolasset.acquisition_year AS acquisition_year, '
-                        . ' lab.id AS lab_id, '
-                        . ' TRIM(labtype.name) AS lab_type, '
-                        . ' school.registry_no AS school_registry_no, '
-                        . ' school.name AS school_name, '
-                        . ' regioneduadmin.name AS region_edu_admin, '
-                        . ' schoolasset.comments AS comments '
-                        . ' FROM schoolasset '
-                        . ' LEFT JOIN itemcategory ON schoolasset.itemcategory_id = itemcategory.id '
-                        . ' LEFT JOIN school ON schoolasset.school_id = school.id '
-                        . ' LEFT JOIN eduadmin ON school.eduadmin_id = eduadmin.id '
-                        . ' LEFT JOIN regioneduadmin ON eduadmin.regioneduadmin_id = regioneduadmin.id '
-                        . ' LEFT JOIN lab ON schoolasset.lab_id = lab.id '
-                        . ' LEFT JOIN labtype ON lab.labtype_id = labtype.id '
-                        . ' GROUP BY schoolasset.id '
-                        . ' ORDER BY lab.id';
+                    . ' schoolasset.qty AS qty, '
+                    . ' schoolasset.acquisition_year AS acquisition_year, '
+                    . ' lab.id AS lab_id, '
+                    . ' TRIM(labtype.name) AS lab_type, '
+                    . ' school.registry_no AS school_registry_no, '
+                    . ' school.name AS school_name, '
+                    . ' regioneduadmin.name AS region_edu_admin, '
+                    . ' schoolasset.comments AS comments '
+                    . ' FROM schoolasset '
+                    . ' LEFT JOIN itemcategory ON schoolasset.itemcategory_id = itemcategory.id '
+                    . ' LEFT JOIN school ON schoolasset.school_id = school.id '
+                    . ' LEFT JOIN eduadmin ON school.eduadmin_id = eduadmin.id '
+                    . ' LEFT JOIN regioneduadmin ON eduadmin.regioneduadmin_id = regioneduadmin.id '
+                    . ' LEFT JOIN lab ON schoolasset.lab_id = lab.id '
+                    . ' LEFT JOIN labtype ON lab.labtype_id = labtype.id '
+                    . ' GROUP BY schoolasset.id '
+                    . ' ORDER BY lab.id';
 
                 $assets = R::getAll($sql);
 
@@ -270,22 +404,22 @@ return function (App $app) {
 
             return function () {
                 $sql = 'SELECT softwarecategory.name AS name, '
-                        . ' school.registry_no AS school_registry_no, '
-                        . ' school.name AS school_name, '
-                        . ' regioneduadmin.name AS region_edu_admin, '
-                        . ' lab.id AS lab_id, '
-                        . ' TRIM(labtype.name) AS lab_type, '
-                        . ' TRIM(software.title) AS title, '
-                        . ' TRIM(software.vendor) AS vendor, '
-                        . ' TRIM(software.url) AS url '
-                        . ' FROM software '
-                        . ' LEFT JOIN softwarecategory ON software.softwarecategory_id = softwarecategory.id '
-                        . ' LEFT JOIN school ON software.school_id = school.id '
-                        . ' LEFT JOIN eduadmin ON school.eduadmin_id = eduadmin.id '
-                        . ' LEFT JOIN regioneduadmin ON eduadmin.regioneduadmin_id = regioneduadmin.id '
-                        . ' LEFT JOIN lab ON software.lab_id = lab.id '
-                        . ' LEFT JOIN labtype ON lab.labtype_id = labtype.id '
-                        . ' ORDER BY school_name ';
+                    . ' school.registry_no AS school_registry_no, '
+                    . ' school.name AS school_name, '
+                    . ' regioneduadmin.name AS region_edu_admin, '
+                    . ' lab.id AS lab_id, '
+                    . ' TRIM(labtype.name) AS lab_type, '
+                    . ' TRIM(software.title) AS title, '
+                    . ' TRIM(software.vendor) AS vendor, '
+                    . ' TRIM(software.url) AS url '
+                    . ' FROM software '
+                    . ' LEFT JOIN softwarecategory ON software.softwarecategory_id = softwarecategory.id '
+                    . ' LEFT JOIN school ON software.school_id = school.id '
+                    . ' LEFT JOIN eduadmin ON school.eduadmin_id = eduadmin.id '
+                    . ' LEFT JOIN regioneduadmin ON eduadmin.regioneduadmin_id = regioneduadmin.id '
+                    . ' LEFT JOIN lab ON software.lab_id = lab.id '
+                    . ' LEFT JOIN labtype ON lab.labtype_id = labtype.id '
+                    . ' ORDER BY school_name ';
 
                 $software = R::getAll($sql);
 
@@ -303,18 +437,18 @@ return function (App $app) {
 
         $c['csv_export_appforms'] = function ($c) {
 
-        	 return function () use ($c) {
-				$settings = $c->get('settings');
+            return function () use ($c) {
+                $settings = $c->get('settings');
                 $version = $settings['application_form']['itemcategory']['currentversion'];
 
                 $appFormIdsSql = 'SELECT id FROM applicationform WHERE (submitted)IN (SELECT MAX( submitted )FROM applicationform '
-                				. ' LEFT JOIN applicationformitem ON applicationformitem.applicationform_id = applicationform.id '
-								. ' LEFT JOIN school ON applicationform.school_id = school.id'
-								. ' LEFT JOIN itemcategory ON applicationformitem.itemcategory_id = itemcategory.id'
-								. ' LEFT JOIN lab ON applicationformitem.lab_id = lab.id'
-								. ' LEFT JOIN labtype ON lab.labtype_id = labtype.id'
-								. ' WHERE itemcategory.groupflag NOT IN(' . $version . ')'
-								. ' GROUP BY school.id)';
+                    . ' LEFT JOIN applicationformitem ON applicationformitem.applicationform_id = applicationform.id '
+                    . ' LEFT JOIN school ON applicationform.school_id = school.id'
+                    . ' LEFT JOIN itemcategory ON applicationformitem.itemcategory_id = itemcategory.id'
+                    . ' LEFT JOIN lab ON applicationformitem.lab_id = lab.id'
+                    . ' LEFT JOIN labtype ON lab.labtype_id = labtype.id'
+                    . ' WHERE itemcategory.groupflag NOT IN(' . $version . ')'
+                    . ' GROUP BY school.id)';
 
 
 
@@ -327,27 +461,26 @@ return function (App $app) {
                 $in = implode(',', array_fill(0, count($appFormIds), '?'));
 
 
-				 $sql = 'SELECT applicationform.id AS id, '
-                       . ' school.registry_no AS school_registry_no, '
-                        . ' school.name AS school_name, '
-                        . ' regioneduadmin.name AS region_edu_admin, '
-                        . ' FROM_UNIXTIME(applicationform.submitted) AS submitted, '
-                        . ' TRIM(applicationform.comments) AS comments' 
-                        . ' FROM applicationformitem '
-                        . ' LEFT JOIN applicationform ON applicationformitem.applicationform_id = applicationform.id '
-                        . ' LEFT JOIN school ON applicationform.school_id = school.id '
-                        . ' LEFT JOIN eduadmin ON school.eduadmin_id = eduadmin.id '
-                        . ' LEFT JOIN regioneduadmin ON eduadmin.regioneduadmin_id = regioneduadmin.id '
-                        . ' LEFT JOIN itemcategory ON applicationformitem.itemcategory_id = itemcategory.id '
-                        . ' LEFT JOIN lab ON applicationformitem.lab_id = lab.id '
-                        . ' LEFT JOIN labtype ON lab.labtype_id = labtype.id '
-                        . ' WHERE applicationform.id IN(' . $in . ')'
-                          . ' GROUP BY school.id ';
+                $sql = 'SELECT applicationform.id AS id, '
+                    . ' school.registry_no AS school_registry_no, '
+                    . ' school.name AS school_name, '
+                    . ' regioneduadmin.name AS region_edu_admin, '
+                    . ' FROM_UNIXTIME(applicationform.submitted) AS submitted, '
+                    . ' TRIM(applicationform.comments) AS comments'
+                    . ' FROM applicationformitem '
+                    . ' LEFT JOIN applicationform ON applicationformitem.applicationform_id = applicationform.id '
+                    . ' LEFT JOIN school ON applicationform.school_id = school.id '
+                    . ' LEFT JOIN eduadmin ON school.eduadmin_id = eduadmin.id '
+                    . ' LEFT JOIN regioneduadmin ON eduadmin.regioneduadmin_id = regioneduadmin.id '
+                    . ' LEFT JOIN itemcategory ON applicationformitem.itemcategory_id = itemcategory.id '
+                    . ' LEFT JOIN lab ON applicationformitem.lab_id = lab.id '
+                    . ' LEFT JOIN labtype ON lab.labtype_id = labtype.id '
+                    . ' WHERE applicationform.id IN(' . $in . ')'
+                    . ' GROUP BY school.id ';
 
                 $appForms = R::getAll($sql, $appFormIds);
 
                 return $appForms;
-
             };
         };
 
@@ -367,22 +500,22 @@ return function (App $app) {
                 $version = $settings['application_form']['itemcategory']['currentversion'];
 
                 $sql = 'SELECT applicationform.id AS id, '
-                       . ' school.registry_no AS school_registry_no, '
-                        . ' school.name AS school_name, '
-                        . ' regioneduadmin.name AS region_edu_admin, '
-                        . ' FROM_UNIXTIME(applicationform.submitted) AS submitted, '
-                        . ' TRIM(applicationform.comments) AS comments' 
-                        . ' FROM applicationformitem '
-                        . ' LEFT JOIN applicationform ON applicationformitem.applicationform_id = applicationform.id '
-                        . ' LEFT JOIN school ON applicationform.school_id = school.id '
-                        . ' LEFT JOIN eduadmin ON school.eduadmin_id = eduadmin.id '
-                        . ' LEFT JOIN regioneduadmin ON eduadmin.regioneduadmin_id = regioneduadmin.id '
-                        . ' LEFT JOIN itemcategory ON applicationformitem.itemcategory_id = itemcategory.id '
-                        . ' LEFT JOIN lab ON applicationformitem.lab_id = lab.id '
-                        . ' LEFT JOIN labtype ON lab.labtype_id = labtype.id '
-                        . ' WHERE applicationform.id IN(' . $in . ')'
-                        . ' AND itemcategory.groupflag IN(' . $version . ')'
-                        . ' GROUP BY school.id ';
+                    . ' school.registry_no AS school_registry_no, '
+                    . ' school.name AS school_name, '
+                    . ' regioneduadmin.name AS region_edu_admin, '
+                    . ' FROM_UNIXTIME(applicationform.submitted) AS submitted, '
+                    . ' TRIM(applicationform.comments) AS comments'
+                    . ' FROM applicationformitem '
+                    . ' LEFT JOIN applicationform ON applicationformitem.applicationform_id = applicationform.id '
+                    . ' LEFT JOIN school ON applicationform.school_id = school.id '
+                    . ' LEFT JOIN eduadmin ON school.eduadmin_id = eduadmin.id '
+                    . ' LEFT JOIN regioneduadmin ON eduadmin.regioneduadmin_id = regioneduadmin.id '
+                    . ' LEFT JOIN itemcategory ON applicationformitem.itemcategory_id = itemcategory.id '
+                    . ' LEFT JOIN lab ON applicationformitem.lab_id = lab.id '
+                    . ' LEFT JOIN labtype ON lab.labtype_id = labtype.id '
+                    . ' WHERE applicationform.id IN(' . $in . ')'
+                    . ' AND itemcategory.groupflag IN(' . $version . ')'
+                    . ' GROUP BY school.id ';
 
                 $appForms = R::getAll($sql, $appFormIds);
 
@@ -392,19 +525,19 @@ return function (App $app) {
 
         $c['csv_export_appforms_items'] = function ($c) {
 
-            return function () use ($c){
+            return function () use ($c) {
 
-            	$settings = $c->get('settings');
+                $settings = $c->get('settings');
                 $version = $settings['application_form']['itemcategory']['currentversion'];
 
                 $appFormIdsSql = 'SELECT id FROM applicationform WHERE (submitted)IN (SELECT MAX( submitted )FROM applicationform '
-                				. ' LEFT JOIN applicationformitem ON applicationformitem.applicationform_id = applicationform.id '
-								. ' LEFT JOIN school ON applicationform.school_id = school.id'
-								. ' LEFT JOIN itemcategory ON applicationformitem.itemcategory_id = itemcategory.id'
-								. ' LEFT JOIN lab ON applicationformitem.lab_id = lab.id'
-								. ' LEFT JOIN labtype ON lab.labtype_id = labtype.id'
-								. ' WHERE itemcategory.groupflag NOT IN(' . $version . ')'
-								. ' GROUP BY school.id)';
+                    . ' LEFT JOIN applicationformitem ON applicationformitem.applicationform_id = applicationform.id '
+                    . ' LEFT JOIN school ON applicationform.school_id = school.id'
+                    . ' LEFT JOIN itemcategory ON applicationformitem.itemcategory_id = itemcategory.id'
+                    . ' LEFT JOIN lab ON applicationformitem.lab_id = lab.id'
+                    . ' LEFT JOIN labtype ON lab.labtype_id = labtype.id'
+                    . ' WHERE itemcategory.groupflag NOT IN(' . $version . ')'
+                    . ' GROUP BY school.id)';
 
                 $appFormIds = R::getCol($appFormIdsSql);
 
@@ -414,25 +547,25 @@ return function (App $app) {
 
                 $in = implode(',', array_fill(0, count($appFormIds), '?'));
                 $sql = 'SELECT applicationform.id AS id, '
-                        . ' school.registry_no AS school_registry_no, '
-                        . ' school.name AS school_name, '
-                        . ' regioneduadmin.name AS region_edu_admin, '
-                        . ' FROM_UNIXTIME(applicationform.submitted) AS submitted, '
-                        . ' lab.id AS lab_id, '
-                        . ' TRIM(labtype.name) AS lab_type, '
-                        . ' IF(lab.is_new = 1, "ΝΑΙ", "ΟΧΙ") AS is_new, '
-                        . ' TRIM(itemcategory.name) AS category, '
-                        . ' applicationformitem.qty AS qty, '
-                        . ' TRIM(applicationformitem.reasons) AS reasons '
-                        . ' FROM applicationformitem '
-                        . ' LEFT JOIN applicationform ON applicationformitem.applicationform_id = applicationform.id '
-                        . ' LEFT JOIN school ON applicationform.school_id = school.id '
-                        . ' LEFT JOIN eduadmin ON school.eduadmin_id = eduadmin.id '
-                        . ' LEFT JOIN regioneduadmin ON eduadmin.regioneduadmin_id = regioneduadmin.id '
-                        . ' LEFT JOIN itemcategory ON applicationformitem.itemcategory_id = itemcategory.id '
-                        . ' LEFT JOIN lab ON applicationformitem.lab_id = lab.id '
-                        . ' LEFT JOIN labtype ON lab.labtype_id = labtype.id '
-                        . ' WHERE applicationform.id IN(' . $in . ') ';
+                    . ' school.registry_no AS school_registry_no, '
+                    . ' school.name AS school_name, '
+                    . ' regioneduadmin.name AS region_edu_admin, '
+                    . ' FROM_UNIXTIME(applicationform.submitted) AS submitted, '
+                    . ' lab.id AS lab_id, '
+                    . ' TRIM(labtype.name) AS lab_type, '
+                    . ' IF(lab.is_new = 1, "ΝΑΙ", "ΟΧΙ") AS is_new, '
+                    . ' TRIM(itemcategory.name) AS category, '
+                    . ' applicationformitem.qty AS qty, '
+                    . ' TRIM(applicationformitem.reasons) AS reasons '
+                    . ' FROM applicationformitem '
+                    . ' LEFT JOIN applicationform ON applicationformitem.applicationform_id = applicationform.id '
+                    . ' LEFT JOIN school ON applicationform.school_id = school.id '
+                    . ' LEFT JOIN eduadmin ON school.eduadmin_id = eduadmin.id '
+                    . ' LEFT JOIN regioneduadmin ON eduadmin.regioneduadmin_id = regioneduadmin.id '
+                    . ' LEFT JOIN itemcategory ON applicationformitem.itemcategory_id = itemcategory.id '
+                    . ' LEFT JOIN lab ON applicationformitem.lab_id = lab.id '
+                    . ' LEFT JOIN labtype ON lab.labtype_id = labtype.id '
+                    . ' WHERE applicationform.id IN(' . $in . ') ';
 
                 $appForms = R::getAll($sql, $appFormIds);
 
@@ -459,27 +592,27 @@ return function (App $app) {
                 $version = $settings['application_form']['itemcategory']['currentversion'];
 
                 $sql = 'SELECT applicationform.id AS id, '
-                        . ' school.registry_no AS school_registry_no, '
-                        . ' school.name AS school_name, '
-                        . ' regioneduadmin.name AS region_edu_admin, '
-                        . ' FROM_UNIXTIME(applicationform.submitted) AS submitted, '
-                        . ' lab.id AS lab_id, '
-                        . ' TRIM(labtype.name) AS lab_type, '
-                        . ' IF(lab.is_new = 1, "ΝΑΙ", "ΟΧΙ") AS is_new, '
-                        . ' TRIM(itemcategory.name) AS category, '
-                        . ' applicationformitem.qty AS qty, '
-                        . ' applicationformitem.qtyacquired AS qtyacquired, '
-                        . ' TRIM(applicationformitem.reasons) AS reasons '
-                        . ' FROM applicationformitem '
-                        . ' LEFT JOIN applicationform ON applicationformitem.applicationform_id = applicationform.id '
-                        . ' LEFT JOIN school ON applicationform.school_id = school.id '
-                        . ' LEFT JOIN eduadmin ON school.eduadmin_id = eduadmin.id '
-                        . ' LEFT JOIN regioneduadmin ON eduadmin.regioneduadmin_id = regioneduadmin.id '
-                        . ' LEFT JOIN itemcategory ON applicationformitem.itemcategory_id = itemcategory.id '
-                        . ' LEFT JOIN lab ON applicationformitem.lab_id = lab.id '
-                        . ' LEFT JOIN labtype ON lab.labtype_id = labtype.id '
-                        . ' WHERE applicationform.id IN(' . $in . ')'
-                        . ' AND itemcategory.groupflag IN(' . $version . ')';
+                    . ' school.registry_no AS school_registry_no, '
+                    . ' school.name AS school_name, '
+                    . ' regioneduadmin.name AS region_edu_admin, '
+                    . ' FROM_UNIXTIME(applicationform.submitted) AS submitted, '
+                    . ' lab.id AS lab_id, '
+                    . ' TRIM(labtype.name) AS lab_type, '
+                    . ' IF(lab.is_new = 1, "ΝΑΙ", "ΟΧΙ") AS is_new, '
+                    . ' TRIM(itemcategory.name) AS category, '
+                    . ' applicationformitem.qty AS qty, '
+                    . ' applicationformitem.qtyacquired AS qtyacquired, '
+                    . ' TRIM(applicationformitem.reasons) AS reasons '
+                    . ' FROM applicationformitem '
+                    . ' LEFT JOIN applicationform ON applicationformitem.applicationform_id = applicationform.id '
+                    . ' LEFT JOIN school ON applicationform.school_id = school.id '
+                    . ' LEFT JOIN eduadmin ON school.eduadmin_id = eduadmin.id '
+                    . ' LEFT JOIN regioneduadmin ON eduadmin.regioneduadmin_id = regioneduadmin.id '
+                    . ' LEFT JOIN itemcategory ON applicationformitem.itemcategory_id = itemcategory.id '
+                    . ' LEFT JOIN lab ON applicationformitem.lab_id = lab.id '
+                    . ' LEFT JOIN labtype ON lab.labtype_id = labtype.id '
+                    . ' WHERE applicationform.id IN(' . $in . ')'
+                    . ' AND itemcategory.groupflag IN(' . $version . ')';
 
 
                 $appForms = R::getAll($sql, $appFormIds);
@@ -487,13 +620,22 @@ return function (App $app) {
                 return $appForms;
             };
         };
-
     });
 
     $events('on', 'app.bootstrap', function (App $app, Container $c) {
 
         $app->get('/export/csv/edulabs_{type}.csv', function (Request $req, Response $res, array $args) use ($c) {
             $type = $args['type'];
+
+            $role = call_user_func($c['current_role']);
+            if (in_array($type, $c['csv_export_protected_exports'])) {
+                if ($role !== 'admin') {
+                    $res = $res->withStatus(403);
+                    $res->getBody()->write('Forbidden. The information requested in not available.');
+                    return $res;
+                }
+            }
+
             try {
                 $config = $c['csv_export_config'];
 

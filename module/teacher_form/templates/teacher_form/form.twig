@@ -4,84 +4,65 @@
 {% import "schools/form.twig" as macros %}
 
 {% block content %}
-<style>
-input[type=text] {
-    width: 100%;
-}
-</style>
-<div id="app-form">
-    <h1>
-    {% block title %}
-    {% endblock %}
-    </h1>
-    <form method="post" action="" data-is-valid="{{ form.is_valid | default(true) ? '1' : '0' }}"
-          data-messages="{{ form.messages|default({})|json_encode }}">
+    <style>
+        input[type=text] {
+            width: 100%;
+        }
+    </style>
+    <div id="app-form">
+        <h1>
+            {% block title %}
+            {% endblock %}
+        </h1>
+        <form method="post" action="" class="form-horizontal"
+              data-is-valid="{{ form.is_valid | default(true) ? '1' : '0' }}"
+              data-messages="{{ form.messages|default({})|json_encode }}">
             <input type="hidden" id="mm_id" name="mm_id" value="0">
             <div class="form-group">
-              <p>
-                        <h1>Αίτηση εκδήλωσης ενδιαφέροντος</h1>
-                        <br>
-                         Στην δράση των edulabs μπορούν να συμμετέχουν εκπαιδευτικοί με εμπειρία σε STEAM που θέλουν να συνεργαστούν με τα σχολεία στην αξιοποίηση των 140 edulabs που εγκαθίστανται σε σχολεία σε όλες τις εκπαιδευτικές διευθύνσεις.
-                        <br>
-                         Παρακαλώ συμπληρώστε τα στοιχεία σας και θα επικοινωνήσουμε μαζί σας.
+                <h1>Αίτηση εκδήλωσης ενδιαφέροντος</h1>
+                <p>Στην δράση των edulabs μπορούν να συμμετέχουν εκπαιδευτικοί με εμπειρία σε STEAM που θέλουν να συνεργαστούν με τα σχολεία στην αξιοποίηση των 140 edulabs που εγκαθίστανται σε σχολεία σε όλες τις εκπαιδευτικές διευθύνσεις.
+                    <br/>Παρακαλώ συμπληρώστε τα στοιχεία σας και θα επικοινωνήσουμε μαζί σας.
                 </p>
-         </div>
+            </div>
 
-        <div class="table-responsive">
-       <fieldset>
-    <!--            <div id="items-list"> -->
-                         {{ macros.input('name', 'Όνομα', form.values.name)}}
-                         {{ macros.input('surname', 'Επώνυμο', form.values.surname)}}
-                         {{ macros.select('eidikothta', 'Ειδικότητα', form.branches, form.values.eidikothta, {'required': ''}) }}
-                         {{ macros.input('arithmitroou', 'Αριθμός Μητρώου', form.values.arithmitroou)}}
-                         {{ macros.input('telef', 'Τηλέφωνο', form.values.telef)}}
-                         {{ macros.input('email', 'Email', form.values.email)}}
-                         <div class="form-group">
-                             <label class="control-label hidden-xs hidden-sm col-md-3" for="select_school">Αναζήτηση σχολείου</label>
-                             <div class="col-xs-12 col-sm-12 col-md-9">
-                                 <input type="text" id="select_school" name="select_school" placeholder="Γράψτε 4 τουλάχιστο χαρακτήρες για αναζήτηση" class="form-control input-sm">
-                             </div>
-                         </div>
-                         {{ macros.input('school', 'Σχολείο που υπηρετείτε', form.values.school, 'text', {'readonly': true})}}
-                         {{ macros.input('schooltelef', 'Τηλέφωνο Σχολείου', form.values.schooltelef, 'text', {'readonly': true})}}
+            <div class="table-responsive">
+                <fieldset>
+                    {{ macros.input('name', 'Όνομα', form.values.name)}}
+                    {{ macros.input('surname', 'Επώνυμο', form.values.surname)}}
+                    {{ macros.select('eidikothta', 'Ειδικότητα', form.branches, form.values.eidikothta, {'required': ''}) }}
+                    {{ macros.input('arithmitroou', 'Αριθμός Μητρώου', form.values.arithmitroou)}}
+                    {{ macros.input('telef', 'Τηλέφωνο', form.values.telef)}}
+                    {{ macros.input('email', 'Email', form.values.email)}}
+                    <div class="form-group">
+                        <label class="control-label hidden-xs hidden-sm col-md-3" for="select_school">Αναζήτηση σχολείου</label>
+                        <div class="col-xs-12 col-sm-12 col-md-9">
+                            <input type="text" id="select_school" name="select_school" placeholder="Γράψτε 4 τουλάχιστο χαρακτήρες για αναζήτηση" class="form-control input-sm">
+                        </div>
+                    </div>
+                    {{ macros.input('school', 'Σχολείο που υπηρετείτε', form.values.school, 'text', {'readonly': true})}}
+                    {{ macros.input('schooltelef', 'Τηλέφωνο Σχολείου', form.values.schooltelef, 'text', {'readonly': true})}}
 
-                         <br>
-                         <br>
-                         <br>
-    <h3> Δράσεις</h3>
-    Παρακαλώ περιγράψτε σύντομα δράσεις που έχετε συμμετάσχει.
-    <div class="input_fields_wrap">
-        <button style="color:blue" class="add_field_button" "btn btn-lg btn-primary">Προσθήκη Επιπλέον</button>
-        <div><label for="projects">Σχετική δράση που συμμετείχατε </label><input type="text" name="projects" id="projects"></div>
-        <div><label for="urlproject">URL δράσης που συμμετείχατε</label><input type="text" name="urlproject" id="urlproject"></div>
-        <div><label for "commentproject">Περιγραφή δράσης που συμμετείχατε</label><input type="text" name="commentsproject" id="commentproject"></div>
+                    <h3>Δράσεις</h3>
+                    <p>Παρακαλώ περιγράψτε σύντομα δράσεις που έχετε συμμετάσχει.</p>
+                    <div class="input_fields_wrap">
+                        <button style="color:blue" class="add_field_button">Προσθήκη Επιπλέον</button>
+                        <div><label for="projects">Σχετική δράση που συμμετείχατε </label><input type="text" name="projects" id="projects"></div>
+                        <div><label for="urlproject">URL δράσης που συμμετείχατε</label><input type="text" name="urlproject" id="urlproject"></div>
+                        <div><label for="commentproject">Περιγραφή δράσης που συμμετείχατε</label><input type="text" name="commentsproject" id="commentproject"></div>
+                    </div>
 
-
+                    <input type="hidden" name="projectdescription" id="projectdescription">
+                    {{ macros.text('comments', 'Σχόλια/Παρατηρήσεις', form.values.comments) }}
+                </fieldset>
+            </div>
+            <hr>
+            <div class="form-group text-center">
+                <button name="submit" value="submit" type="submit" id ="submit" class="btn btn-lg btn-primary">Υποβολή</button>
+            </div>
+            <input type="hidden" name="{{ csrf.name_key }}" value="{{ csrf.name }}">
+            <input type="hidden" name="{{ csrf.value_key }}" value="{{ csrf.value }}">
+        </form>
     </div>
-
-   <input type="hidden" name="projectdescription" id="projectdescription">
-
-   <p>
-    <p>
-
-<!--                </div>  -->
-                {{ macros.text('comments', 'Σχόλια/Παρατηρήσεις', form.values.comments) }}
-
-
-
-
-            </fieldset>
-        </div>
-        <hr>
-        <div class="form-group text-center">
-            <button name="submit" value="submit" type="submit" id ="submit" class="btn btn-lg btn-primary">Υποβολή</button>
-        </div>
-        <input type="hidden" name="{{ csrf.name_key }}" value="{{ csrf.name }}">
-        <input type="hidden" name="{{ csrf.value_key }}" value="{{ csrf.value }}">
-    </form>
-
-
-</div>
 {% endblock %}
 
 {% block inlinejs %}
@@ -89,7 +70,5 @@ input[type=text] {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.2.3/backbone-min.js"></script>
     <script src="{{ base_url }}/js/jquery-ui.autoc.min.js"></script>
-
-    <script src="{{ base_url() }}/js/teacher_form/index.js"></script>
-
+    <script src="{{ base_url() }}/js/teacher_form/index-1.1.js"></script>
 {% endblock %}
