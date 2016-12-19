@@ -7,6 +7,7 @@ use Slim\App;
 use Slim\Container;
 use Slim\Http\Request;
 use Slim\Http\Response;
+use GrEduLabs\UniversityForm\Service\UniversityFormService;
 
 /**
  * gredu_labs.
@@ -153,6 +154,7 @@ return function (App $app) {
                         'Όνομα',
                         'Επώνυμο',
                         'Ειδικότητα',
+                        'Ειδικότητα (λεκτικό)',
                         'Αριθμός Μητρώου',
                         'Τηλέφωνο',
                         'Email',
@@ -242,43 +244,32 @@ return function (App $app) {
         $c['csv_export_volunteer_teachers'] = function ($c) {
 
             return function () {
-                $sql = 'SELECT `id`, '
-                    . '`name`, '
-                    . '`surname`, '
-                    . '`eidikothta`, '
-                    . '`arithmitroou`, '
-                    . '`telef`, '
-                    . '`email`, '
-                    . '`school`, '
-                    . '`schooltelef`, '
-                    . '`comments`, '
-                    . '`projecttitle`, '
-                    . '`projecturl`, '
-                    . '`projectdescription` '
-                    . ' FROM `volunteerteachers` '
+                $sql = 'SELECT `volunteerteachers`.`id`, '
+                    . '`volunteerteachers`.`name`, '
+                    . '`volunteerteachers`.`surname`, '
+                    . '`volunteerteachers`.`eidikothta`, '
+                    . '`branch`.`name` AS `eidikothta_name`, '
+                    . '`volunteerteachers`.`arithmitroou`, '
+                    . '`volunteerteachers`.`telef`, '
+                    . '`volunteerteachers`.`email`, '
+                    . '`volunteerteachers`.`school`, '
+                    . '`volunteerteachers`.`schooltelef`, '
+                    . '`volunteerteachers`.`comments`, '
+                    . '`volunteerteachers`.`projecttitle`, '
+                    . '`volunteerteachers`.`projecturl`, '
+                    . '`volunteerteachers`.`projectdescription` '
+                    . ' FROM `volunteerteachers` JOIN `branch` ON (`volunteerteachers`.`eidikothta` = `branch`.`id`) '
+//                    . ' FROM `volunteerteachers` '
                     . ' ORDER BY id ';
 
                 $volunteer_teachers = R::getAll($sql);
 
                 $volunteer_teachers = array_map(function ($row) {
-                    if (($projects = preg_split('/###@@@###/msUu', $row['projectdescription'])) !== false) {
-                        $projects_parts = array_map(function ($r) {
-                            return preg_split('/_@@@_/msUu', $r);
-                        }, $projects);
-                        $projects_cnt = 0;
-                        foreach ($projects_parts as $part) {
-                            if (count($part) > $projects_cnt) {
-                                $projects_cnt = count($part);
-                            }
+                    $row['projectdescription'] = UniversityFormService::recomposeProjects($row['projectdescription'], false);
+                    if (($projects = preg_split('/' . UniversityFormService::PLAIN_TEXT_SEPARATOR . '/msUu', $row['projectdescription'])) !== false) {
+                        foreach ($projects as $i => $proj) {
+                            $row["project{$i}"] = $proj;
                         }
-                        $recons = array_fill(0, $projects_cnt, '');
-                        for ($i = 0; $i < $projects_cnt; $i++) {
-                            $recons[$i] .= $projects_parts[0][$i] . "\r\n"
-                                . (isset($projects_parts[1][$i]) ? $projects_parts[1][$i] : '') . "\r\n"
-                                . (isset($projects_parts[2][$i]) ? $projects_parts[2][$i] : '');
-                            $row['project' . $i] = $recons[$i];
-                        }
-                        $row['projectdescription'] = implode("\r\n--------------\r\n", $recons);
                     }
                     return $row;
                 }, $volunteer_teachers);
@@ -309,24 +300,11 @@ return function (App $app) {
                 $volunteer_institutions = R::getAll($sql);
 
                 $volunteer_institutions = array_map(function ($row) {
-                    if (($projects = preg_split('/###@@@###/msUu', $row['projectdescription'])) !== false) {
-                        $projects_parts = array_map(function ($r) {
-                            return preg_split('/_@@@_/msUu', $r);
-                        }, $projects);
-                        $projects_cnt = 0;
-                        foreach ($projects_parts as $part) {
-                            if (count($part) > $projects_cnt) {
-                                $projects_cnt = count($part);
-                            }
+                    $row['projectdescription'] = UniversityFormService::recomposeProjects($row['projectdescription'], false);
+                    if (($projects = preg_split('/' . UniversityFormService::PLAIN_TEXT_SEPARATOR . '/msUu', $row['projectdescription'])) !== false) {
+                        foreach ($projects as $i => $proj) {
+                            $row["project{$i}"] = $proj;
                         }
-                        $recons = array_fill(0, $projects_cnt, '');
-                        for ($i = 0; $i < $projects_cnt; $i++) {
-                            $recons[$i] .= $projects_parts[0][$i] . "\r\n"
-                                . (isset($projects_parts[1][$i]) ? $projects_parts[1][$i] : '') . "\r\n"
-                                . (isset($projects_parts[2][$i]) ? $projects_parts[2][$i] : '');
-                            $row['project' . $i] = $recons[$i];
-                        }
-                        $row['projectdescription'] = implode("\r\n--------------\r\n", $recons);
                     }
                     return $row;
                 }, $volunteer_institutions);

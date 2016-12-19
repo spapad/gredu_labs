@@ -48,6 +48,8 @@ return [
                 ['/teacher-form/submit-success',['guest'], ['get','post']],
                 ['/teacher-form/mm',['guest'], ['get']],
                 ['/admin', ['admin'], ['get']],
+                ['/admin/university-form/display', ['admin'], ['get']],
+                ['/admin/teacher-form/display', ['admin'], ['get']],
             ],
         ],
     ],

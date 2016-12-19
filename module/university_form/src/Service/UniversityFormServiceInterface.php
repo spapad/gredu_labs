@@ -13,4 +13,9 @@ namespace GrEduLabs\UniversityForm\Service;
 interface UniversityFormServiceInterface
 {
     public function submit(array $data);
+    
+    /**
+     * Gets all forms and return an array of data
+     */
+    public function findAll();
 }

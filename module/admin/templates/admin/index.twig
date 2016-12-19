@@ -16,11 +16,17 @@
                 <tbody>
                     <tr>
                         <td>Καταχωρημένες αιτήσεις εθελοντών - Εκπαιδευτικοί</td>
-                        <td><a class="btn btn-primary btn-sm" href="{{ path_for('export.csv', {type: 'volunteer_teachers'}) }}"><i class="fa fa-download"></i> Αρχείο .csv</a></td>
+                        <td class="text-right">
+                            <a class="btn btn-primary btn-sm" href="{{ path_for('export.csv', {type: 'volunteer_teachers'}) }}"><i class="fa fa-download"></i> Αρχείο .csv</a>
+                            <a class="btn btn-default btn-sm" href="{{ path_for('admin.volunteer.teacher') }}"><span class="fa fa-list"></span> Προβολή</a>
+                        </td>
                     </tr>
                     <tr>
                         <td>Καταχωρημένες αιτήσεις εθελοντών - Ιδρύματα</td>
-                        <td><a class="btn btn-primary btn-sm" href="{{ path_for('export.csv', {type: 'volunteer_institutions'}) }}"><span class="fa fa-download"></span> Αρχείο .csv</a></td>
+                        <td class="text-right">
+                            <a class="btn btn-primary btn-sm" href="{{ path_for('export.csv', {type: 'volunteer_institutions'}) }}"><span class="fa fa-download"></span> Αρχείο .csv</a>
+                            <a class="btn btn-default btn-sm" href="{{ path_for('admin.volunteer.univ') }}"><span class="fa fa-list"></span> Προβολή</a>
+                        </td>
                     </tr>
                 </tbody>
             </table>

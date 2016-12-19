@@ -12,10 +12,9 @@ use Slim\Http\Response;
  * @copyright Copyright (c) 2008-2015 Greek Free/Open Source Software Society (https://gfoss.ellak.gr/)
  * @license GNU GPLv3 http://www.gnu.org/licenses/gpl-3.0-standalone.html
  */
-
 return function (App $app) {
     $container = $app->getContainer();
-    $events    = $container['events'];
+    $events = $container['events'];
 
     $events('on', 'app.autoload', function ($autoloader) {
         $autoloader->addPsr4('GrEduLabs\\TeacherForm\\', __DIR__ . '/src/');
@@ -33,17 +32,22 @@ return function (App $app) {
 
         $container[GrEduLabs\TeacherForm\Action\TeacherForm::class] = function ($c) {
             return new GrEduLabs\TeacherForm\Action\TeacherForm(
-                $c->get('view'),
-                $c->get(GrEduLabs\TeacherForm\Service\TeacherFormServiceInterface::class),
-                $c->get(GrEduLabs\TeacherForm\InputFilter\TeacherForm::class),
-                $c->get('router')->pathFor('teacher_form.submit_success'),
-                $c);
+                $c->get('view'), $c->get(GrEduLabs\TeacherForm\Service\TeacherFormServiceInterface::class), $c->get(GrEduLabs\TeacherForm\InputFilter\TeacherForm::class), $c->get('router')->pathFor('teacher_form.submit_success'), $c);
         };
 
         $container[GrEduLabs\TeacherForm\Action\SubmitSuccess::class] = function ($c) {
             return new GrEduLabs\TeacherForm\Action\SubmitSuccess(
-                $c->get('view'),
-                $c->get('router')->pathFor('teacher_form')
+                $c->get('view'), $c->get('router')->pathFor('teacher_form')
+            );
+        };
+
+        $container[GrEduLabs\TeacherForm\Service\TeacherFormServiceInterface::class] = function ($c) {
+            return new GrEduLabs\TeacherForm\Service\TeacherFormService();
+        };
+
+        $container[GrEduLabs\TeacherForm\Action\Display::class] = function ($c) {
+            return new GrEduLabs\TeacherForm\Action\Display(
+                $c->get('view'), $c->get(GrEduLabs\TeacherForm\Service\TeacherFormServiceInterface::class)
             );
         };
     });
@@ -64,12 +68,12 @@ return function (App $app) {
             $school_name = $req->getQueryParam('term');
 
             $httpClient = new GuzzleHttp\Client([
-                    'base_uri' => $container['settings']['sch_mm']['public_api_url']
-                    ]);
+                'base_uri' => $container['settings']['sch_mm']['public_api_url']
+            ]);
 
-            $config   = $httpClient->getConfig();
-            $baseUri  = $config['base_uri'];
-            $url      = $baseUri . "?name=" . $school_name;
+            $config = $httpClient->getConfig();
+            $baseUri = $config['base_uri'];
+            $url = $baseUri . "?name=" . $school_name;
             $response = $httpClient->request('GET', $url);
 
             $responseData = json_decode($response->getBody()->getContents(), true);
@@ -78,7 +82,7 @@ return function (App $app) {
             }
             $cnt = count($responseData['data']);
             $school_arr = [];
-            for ($i=0; $i<$cnt; $i++) {
+            for ($i = 0; $i < $cnt; $i++) {
                 $school_arr[$i]['mm_id'] = $responseData['data'][$i]['mm_id'];
                 $school_arr[$i]['value'] = $responseData['data'][$i]['name'];
                 $school_arr[$i]['tel'] = $responseData['data'][$i]['phone_number'];
@@ -86,5 +90,8 @@ return function (App $app) {
 
             return $res->withJson($school_arr);
         })->setName('teacher_form.mm');
+
+        $app->get('/admin/teacher-form/display', GrEduLabs\TeacherForm\Action\Display::class)
+            ->setName('admin.volunteer.teacher');
     });
 };
