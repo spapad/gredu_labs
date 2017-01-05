@@ -676,6 +676,55 @@ LOCK TABLES `tpesurvey` WRITE;
 /*!40000 ALTER TABLE `tpesurvey` ENABLE KEYS */;
 UNLOCK TABLES;
 
+
+--
+-- Table structure for table `volunteerteachers`
+--
+
+DROP TABLE IF EXISTS `volunteerteachers`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `volunteerteachers` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `surname` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `eidikothta` int(11) UNSIGNED,
+  `arithmitroou` int(11) NOT NULL,
+  `telef` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `school` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `schooltelef` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `projectdescription` text COLLATE utf8mb4_unicode_ci,
+  `comments` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+ALTER TABLE `volunteerteachers` ADD CONSTRAINT `fk_branch_id` FOREIGN KEY (`eidikothta`) REFERENCES `branch`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+--
+-- Table structure for table `univ`
+--
+
+DROP TABLE IF EXISTS `univ`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `univ` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `ereunitiko` varchar(191) COLLATE utf8mb4_unicode_ci,
+  `institute` varchar(191) COLLATE utf8mb4_unicode_ci,
+  `other` varchar(191) COLLATE utf8mb4_unicode_ci,
+  `idrima` varchar(191) COLLATE utf8mb4_unicode_ci,
+  `sxolh` varchar(191) COLLATE utf8mb4_unicode_ci,
+  `tmhma` varchar(191) COLLATE utf8mb4_unicode_ci,
+  `person` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `telef` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `erga` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `projectdescription` text COLLATE utf8mb4_unicode_ci,
+  `comments` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
